@@ -1,0 +1,528 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon.svg"><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style></head><body>
+<title>Bolta Khata</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#1F5F7A">
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind:wght@400;500;700&display=swap">
+<style>
+/* Layout: one phone-width column; mic on home; four bottom tabs (Aaj, Stock, Gahak, Report) */
+:root{
+  --bg:#F6F5F1; --card:#FFFFFF; --ink:#1E2328; --muted:#5E646B; --line:#E2E0D8;
+  --accent:#1F5F7A; --on-accent:#FFFFFF;
+  --udhaar:#B3261E; --udhaar-bg:#FBE9E7; --wapsi:#1E7A45; --wapsi-bg:#E5F4EA;
+  --sale:#1F5F7A; --sale-bg:#E3EFF4; --stock:#5B4BA8; --stock-bg:#ECEAF8; --kharcha:#8A5A00; --kharcha-bg:#FBF0DA;
+  --font-ui:"Hind","Segoe UI",system-ui,sans-serif; --r:14px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#14181B; --card:#1D2226; --ink:#ECEDEE; --muted:#A3A9AF; --line:#2E353A; --accent:#5FB0D0; --on-accent:#0B1A21;
+  --udhaar:#FF8A80; --udhaar-bg:#3A1F1D; --wapsi:#7FD6A0; --wapsi-bg:#18321F;
+  --sale:#7CC4E0; --sale-bg:#17303A; --stock:#B8ADF0; --stock-bg:#28233F; --kharcha:#F2C46B; --kharcha-bg:#3A2D12; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#14181B; --card:#1D2226; --ink:#ECEDEE; --muted:#A3A9AF; --line:#2E353A; --accent:#5FB0D0; --on-accent:#0B1A21;
+  --udhaar:#FF8A80; --udhaar-bg:#3A1F1D; --wapsi:#7FD6A0; --wapsi-bg:#18321F;
+  --sale:#7CC4E0; --sale-bg:#17303A; --stock:#B8ADF0; --stock-bg:#28233F; --kharcha:#F2C46B; --kharcha-bg:#3A2D12; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-ui);font-size:17px;line-height:1.5}
+.app{max-width:480px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px 100px;display:flex;flex-direction:column;gap:16px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-size:26px;font-weight:700;margin:0;letter-spacing:-.01em}
+.status{color:var(--muted);font-size:13px;text-align:right}
+.status b{font-weight:500}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--wapsi);margin-right:4px}
+.dot.off{background:var(--kharcha)}
+.num{font-variant-numeric:tabular-nums}
+.stack{display:flex;flex-direction:column;gap:16px}
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:8px 12px;min-width:0}
+.stat small{color:var(--muted);font-size:12px;display:block}
+.stat b{font-size:18px;font-weight:700;white-space:nowrap}
+.c-sale{color:var(--sale)} .c-udhaar{color:var(--udhaar)} .c-wapsi{color:var(--wapsi)} .c-stock{color:var(--stock)} .c-kharcha{color:var(--kharcha)}
+.demo{background:var(--card);border:1px dashed var(--line);border-radius:var(--r);padding:6px 14px;font-size:14px;color:var(--muted);display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.linkbtn{background:none;border:0;color:var(--accent);font:inherit;font-size:14px;cursor:pointer;padding:4px}
+.mic-zone{display:flex;flex-direction:column;align-items:center;gap:8px}
+.mic{width:120px;height:120px;border-radius:50%;border:0;background:var(--accent);color:var(--on-accent);cursor:pointer;display:grid;place-items:center;transition:transform .15s}
+.mic:active{transform:scale(.96)}
+.mic svg{width:50px;height:50px}
+.mic.live{animation:pulse 1.2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 55%,transparent)}100%{box-shadow:0 0 0 26px transparent}}
+@media (prefers-reduced-motion:reduce){.mic.live{animation:none;outline:4px solid var(--accent);outline-offset:6px}}
+.pills{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:13px;color:var(--muted)}
+.pill{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--card);color:var(--muted);border-radius:999px;padding:2px 12px;cursor:pointer}
+.pill.on{border-color:var(--accent);color:var(--accent);font-weight:500}
+.hint{color:var(--muted);font-size:15px;text-align:center;margin:0}
+.hint.warn{color:var(--udhaar)}
+.heard{font-size:15px;text-align:center;min-height:1.5em;margin:0}
+.typebox{display:flex;gap:8px}
+.typebox input{flex:1;min-width:0}
+input,select{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 12px;min-height:46px;width:100%;min-width:0}
+input:focus-visible,button:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.btn{font:inherit;font-weight:500;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 16px;min-height:46px;cursor:pointer;white-space:nowrap}
+.btn.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.confirm{background:var(--card);border:2px solid var(--accent);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:10px}
+.confirm h2{font-size:18px;margin:0;font-weight:700}
+.raw{font-size:14px;color:var(--muted);margin:0}
+.field{display:flex;flex-direction:column;gap:2px;min-width:0}
+.field label{font-size:13px;color:var(--muted)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px}
+.kinds{display:flex;flex-wrap:wrap;gap:6px}
+.kind{font:inherit;font-size:14px;font-weight:500;border:1px solid var(--line);background:var(--card);color:var(--muted);border-radius:10px;padding:6px 12px;min-height:40px;cursor:pointer}
+.kind.on[data-k="sale"]{background:var(--sale-bg);color:var(--sale);border-color:transparent}
+.kind.on[data-k="udhaar"]{background:var(--udhaar-bg);color:var(--udhaar);border-color:transparent}
+.kind.on[data-k="wapsi"]{background:var(--wapsi-bg);color:var(--wapsi);border-color:transparent}
+.kind.on[data-k="stockin"]{background:var(--stock-bg);color:var(--stock);border-color:transparent}
+.kind.on[data-k="kharcha"]{background:var(--kharcha-bg);color:var(--kharcha);border-color:transparent}
+.small{font-size:13px;color:var(--muted)}
+.small.warn{color:var(--udhaar)}
+.actions{display:grid;grid-template-columns:2fr 1fr;gap:10px}
+section h3{font-size:16px;margin:0 0 6px;font-weight:700}
+.list{background:var(--card);border:1px solid var(--line);border-radius:var(--r);list-style:none;margin:0;padding:0 14px}
+.list>li{display:flex;align-items:center;gap:10px;min-height:60px;padding-block:6px}
+.list>li+li{border-top:1px solid var(--line)}
+.who{flex:1;min-width:0}
+.who b{font-weight:500;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.who small{color:var(--muted);font-size:13px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.amt{font-weight:700;font-size:17px;white-space:nowrap}
+.tag{font-size:12px;border-radius:6px;padding:0 8px;white-space:nowrap}
+.tag.sale{background:var(--sale-bg);color:var(--sale)} .tag.udhaar{background:var(--udhaar-bg);color:var(--udhaar)}
+.tag.wapsi{background:var(--wapsi-bg);color:var(--wapsi)} .tag.stockin{background:var(--stock-bg);color:var(--stock)} .tag.kharcha{background:var(--kharcha-bg);color:var(--kharcha)}
+.tag.low{background:var(--udhaar-bg);color:var(--udhaar)}
+.empty{color:var(--muted);justify-content:center;text-align:center;font-size:15px}
+.rowbtn{width:100%;font:inherit;color:inherit;background:none;border:0;text-align:left;display:flex;align-items:center;gap:10px;min-height:60px;cursor:pointer;padding:6px 0}
+.expand{padding:0 0 12px;font-size:14px;display:flex;flex-direction:column;gap:8px}
+.hist div{display:flex;justify-content:space-between;gap:8px;padding:4px 0;border-top:1px dotted var(--line)}
+.x{background:none;border:0;color:var(--muted);cursor:pointer;font:inherit;font-size:13px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:10px}
+.panel h3{margin:0}
+.rep{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.rep .stat b{font-size:20px}
+.rep .big{grid-column:1/-1;background:var(--sale-bg);border-color:transparent}
+.rep .big b{font-size:26px}
+.kv{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-top:1px solid var(--line);font-size:15px}
+.kv:first-of-type{border-top:0}
+.reprow{display:flex;gap:8px;align-items:end}
+nav{position:fixed;inset:auto 0 0 0;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);z-index:5}
+nav div{max-width:480px;width:100%;display:grid;grid-template-columns:repeat(4,1fr)}
+nav button{font:inherit;font-size:15px;font-weight:500;border:0;background:none;color:var(--muted);min-height:60px;cursor:pointer;border-top:3px solid transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0}
+nav button svg{width:22px;height:22px}
+nav button.on{color:var(--accent);border-top-color:var(--accent)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(76px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);border-radius:12px;padding:8px 16px;display:flex;gap:14px;align-items:center;font-size:15px;z-index:6;max-width:calc(100% - 32px)}
+.toast button{background:none;border:0;color:inherit;text-decoration:underline;font:inherit;cursor:pointer}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+
+<div class="app">
+  <header>
+    <h1 class="brand">Bolta Khata</h1>
+    <div class="status"><div id="today"></div><div><span class="dot" id="netDot"></span><b id="netTxt">Online</b></div></div>
+  </header>
+
+  <!-- AAJ -->
+  <div id="p-aaj" class="stack">
+    <div class="summary">
+      <div class="stat"><small>Aaj ki sale</small><b class="num c-sale" id="sSale">0</b></div>
+      <div class="stat"><small>Galla (cash)</small><b class="num c-wapsi" id="sCash">0</b></div>
+      <div class="stat"><small>Kul udhaar</small><b class="num c-udhaar" id="sUdh">0</b></div>
+    </div>
+    <div class="demo" id="demoBar" hidden><span>Ye misaal ka data hai, asli nahi.</span><button class="linkbtn" id="clearDemo">Saaf karein</button></div>
+
+    <div class="mic-zone">
+      <button class="mic" id="micBtn" aria-label="Bol kar likhwayein">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg>
+      </button>
+      <div class="pills" role="group" aria-label="Mic ki zabaan"><span>Mic likhe:</span>
+        <button type="button" class="pill on" data-l="en-IN">Roman</button><button type="button" class="pill" data-l="ur-PK">اردو</button></div>
+      <p class="hint" id="micHint">Bolein: "2 kilo cheeni bechi" ya "Aslam ko 500 udhaar"</p>
+      <p class="heard" id="heard" aria-live="polite"></p>
+    </div>
+
+    <form class="typebox" id="typeForm">
+      <label for="typeIn" class="sr">Likh kar entry</label>
+      <input id="typeIn" placeholder="Ya likhein: 3 packet ghee becha" autocomplete="off">
+      <button class="btn" type="submit">Samjho</button>
+    </form>
+    <div class="chips" id="chips"></div>
+
+    <div class="confirm" id="confirm" hidden>
+      <h2>Kya ye theek hai?</h2>
+      <p class="raw" id="cRaw"></p>
+      <div class="kinds" id="kinds" role="group" aria-label="Entry ki qisam"></div>
+      <div class="field" id="fCust"><label for="cName">Gahak</label><input id="cName" list="custNames" autocomplete="off"><span class="small" id="cNew" hidden>Naya gahak banega</span></div>
+      <div class="grid3" id="fItem">
+        <div class="field"><label for="cItem">Saman</label><input id="cItem" list="itemNames" autocomplete="off"></div>
+        <div class="field"><label for="cQty">Miqdar</label><input id="cQty" inputmode="decimal" class="num"></div>
+        <div class="field"><label for="cUnit">Unit</label><input id="cUnit" autocomplete="off"></div>
+      </div>
+      <span class="small" id="cItemInfo"></span>
+      <div class="grid2">
+        <div class="field"><label for="cAmt">Raqam (Rs)</label><input id="cAmt" inputmode="numeric" class="num"></div>
+        <div class="field"><label for="cNote">Note</label><input id="cNote" autocomplete="off"></div>
+      </div>
+      <p class="small warn" id="cErr" hidden></p>
+      <div class="actions"><button class="btn primary" id="cOk" type="button">Theek hai, save karein</button><button class="btn" id="cNo" type="button">Chhorein</button></div>
+    </div>
+    <datalist id="custNames"></datalist><datalist id="itemNames"></datalist>
+
+    <section><h3>Aaj ki entries</h3><ul class="list" id="todayList"></ul></section>
+  </div>
+
+  <!-- STOCK -->
+  <div id="p-stock" class="stack" hidden>
+    <div class="summary">
+      <div class="stat"><small>Kul saman</small><b class="num" id="stCount">0</b></div>
+      <div class="stat"><small>Kam stock</small><b class="num c-udhaar" id="stLow">0</b></div>
+      <div class="stat"><small>Stock ki qeemat</small><b class="num c-stock" id="stVal">0</b></div>
+    </div>
+    <label for="sq" class="sr">Saman talash</label>
+    <input id="sq" placeholder="Saman talash karein" autocomplete="off">
+    <ul class="list" id="stockList"></ul>
+    <form class="panel" id="addItem">
+      <h3>Naya saman</h3>
+      <div class="grid2">
+        <div class="field"><label for="iName">Naam</label><input id="iName" placeholder="Cheeni" autocomplete="off"></div>
+        <div class="field"><label for="iUnit">Unit</label><input id="iUnit" placeholder="kilo" list="unitList" autocomplete="off"></div>
+        <div class="field"><label for="iBuy">Khareed qeemat</label><input id="iBuy" inputmode="numeric" placeholder="145"></div>
+        <div class="field"><label for="iSell">Bechne ki qeemat</label><input id="iSell" inputmode="numeric" placeholder="160"></div>
+        <div class="field"><label for="iQty">Abhi kitna hai</label><input id="iQty" inputmode="decimal" placeholder="40"></div>
+        <div class="field"><label for="iLow">Kam hone par batao</label><input id="iLow" inputmode="decimal" placeholder="5"></div>
+      </div>
+      <p class="small warn" id="iErr" hidden></p>
+      <button class="btn primary" type="submit">Saman add karein</button>
+    </form>
+    <datalist id="unitList"><option value="kilo"><option value="packet"><option value="litre"><option value="piece"><option value="darjan"><option value="gaz"><option value="suit"><option value="meter"></datalist>
+  </div>
+
+  <!-- GAHAK -->
+  <div id="p-gahak" class="stack" hidden>
+    <label for="q" class="sr">Gahak talash</label>
+    <input id="q" placeholder="Gahak talash karein" autocomplete="off">
+    <ul class="list" id="custList"></ul>
+  </div>
+
+  <!-- REPORT -->
+  <div id="p-report" class="stack" hidden>
+    <div class="reprow">
+      <div class="field" style="flex:1"><label for="rDate">Din</label><input type="date" id="rDate"></div>
+      <button class="btn" id="rCopy" type="button">Copy (WhatsApp)</button>
+    </div>
+    <div class="rep" id="repStats"></div>
+    <div class="panel"><h3>Hisaab ki tafseel</h3><div id="repKv"></div></div>
+    <div class="panel"><h3>Sabse zyada bika</h3><div id="repTop"></div></div>
+    <div class="panel"><h3>Ye saman mangwana hai</h3><div id="repLow"></div></div>
+    <div class="panel"><h3>Backup</h3>
+      <p class="small" style="margin:0">Saara data phone mein save hai. Hafte mein ek dafa backup file bana kar WhatsApp par khud ko bhej dein.</p>
+      <div class="grid2"><button class="btn" id="bkSave" type="button">Backup banayein</button><label class="btn" style="text-align:center">Backup wapis lein<input type="file" id="bkLoad" accept=".json,application/json" class="sr"></label></div>
+      <p class="small" id="bkMsg"></p>
+    </div>
+  </div>
+</div>
+
+<nav><div>
+  <button data-p="aaj" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/></svg>Aaj</button>
+  <button data-p="stock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/><path d="M12 11v10"/></svg>Stock</button>
+  <button data-p="gahak"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0"/><path d="M17 4a4 4 0 0 1 0 8M22 21a7 7 0 0 0-4-6.3"/></svg>Gahak</button>
+  <button data-p="report"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Report</button>
+</div></nav>
+
+<div class="toast" id="toast" hidden><span id="toastMsg"></span><button id="toastUndo">Wapis lein</button></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const uid=()=>Math.random().toString(36).slice(2,9);
+const rs=n=>'Rs '+Math.round(n||0).toLocaleString('en-PK');
+const fq=n=>+(+n||0).toFixed(2);
+const KIND={sale:'Naqad sale',udhaar:'Udhaar',wapsi:'Wapsi',stockin:'Maal aaya',kharcha:'Kharcha'};
+let S={items:[],customers:[],entries:[],demo:false};
+let pending=null,lastSaved=null,openCust=null,openItem=null,micLang='en-IN';
+
+/* ---------- storage: IndexedDB (bara data), localStorage fallback ---------- */
+const DBN='bolta-khata',ST='kv';
+function idb(){return new Promise((res,rej)=>{try{const r=indexedDB.open(DBN,1);r.onupgradeneeded=()=>r.result.createObjectStore(ST);r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}catch(e){rej(e)}})}
+async function load(){
+  try{const db=await idb();const v=await new Promise((res,rej)=>{const q=db.transaction(ST).objectStore(ST).get('state');q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)});if(v)return v}catch(e){}
+  try{const r=localStorage.getItem(DBN);if(r)return JSON.parse(r)}catch(e){}return null}
+async function save(){
+  try{const db=await idb();db.transaction(ST,'readwrite').objectStore(ST).put(JSON.parse(JSON.stringify(S)),'state');return}catch(e){}
+  try{localStorage.setItem(DBN,JSON.stringify(S))}catch(e){}}
+
+function seed(){
+  const now=Date.now(),h=3600000,d=24*h;
+  const it=(name,unit,buy,sell,qty,low)=>({id:uid(),name,unit,buy,sell,qty,low});
+  const items=[it('Cheeni','kilo',145,160,38,10),it('Chawal','kilo',290,320,22,10),it('Ghee','packet',520,560,4,6),
+    it('Doodh','litre',200,220,15,5),it('Atta','kilo',105,120,60,20),it('Chai patti','packet',330,370,9,4),it('Sabun','piece',90,110,30,10)];
+  const cs=['Aslam','Bilal','Rasheed bhai','Nasreen baji'].map(name=>({id:uid(),name}));
+  const E=(kind,o,ago)=>Object.assign({id:uid(),kind,ts:now-ago,note:''},o);
+  S={demo:true,items,customers:cs,entries:[
+    E('udhaar',{cid:cs[0].id,iid:items[2].id,qty:2,unit:'packet',amount:1120},3*d),
+    E('udhaar',{cid:cs[2].id,amount:2300,note:'mahine ka sauda'},5*d),
+    E('udhaar',{cid:cs[1].id,iid:items[1].id,qty:3,unit:'kilo',amount:960},2*d),
+    E('wapsi',{cid:cs[0].id,amount:500},d),
+    E('stockin',{iid:items[4].id,qty:40,unit:'kilo',amount:4200},6*h),
+    E('sale',{iid:items[0].id,qty:2,unit:'kilo',amount:320},5*h),
+    E('sale',{iid:items[3].id,qty:3,unit:'litre',amount:660},4*h),
+    E('udhaar',{cid:cs[3].id,iid:items[5].id,qty:1,unit:'packet',amount:370},3*h),
+    E('kharcha',{amount:150,note:'chai aur paani'},2.5*h),
+    E('wapsi',{cid:cs[1].id,amount:300},2*h),
+    E('sale',{iid:items[4].id,qty:5,unit:'kilo',amount:600},h),
+    E('sale',{iid:items[0].id,qty:1,unit:'kilo',amount:160},.5*h)]};
+}
+
+/* ---------- parser ---------- */
+const NUM={ek:1,aik:1,ik:1,one:1,do:2,two:2,teen:3,tin:3,char:4,chaar:4,panch:5,paanch:5,panj:5,chhe:6,chay:6,che:6,saat:7,sat:7,aath:8,ath:8,nau:9,das:10,dus:10,gyarah:11,barah:12,pandrah:15,bees:20,bis:20,pachees:25,tees:30,chalees:40,pachaas:50,pachas:50,sattar:70,assi:80,nabbe:90,dedh:1.5,derh:1.5,dhai:2.5,dhaai:2.5,adha:.5,aadha:.5,
+ 'ایک':1,'دو':2,'تین':3,'چار':4,'پانچ':5,'چھ':6,'چھے':6,'سات':7,'آٹھ':8,'نو':9,'دس':10,'گیارہ':11,'بارہ':12,'پندرہ':15,'بیس':20,'پچیس':25,'تیس':30,'چالیس':40,'پچاس':50,'ساٹھ':60,'ستر':70,'اسی':80,'نوے':90,'ڈیڑھ':1.5,'ڈھائی':2.5,'آدھا':.5};
+const MULT={sau:100,so:100,hundred:100,'سو':100,hazar:1000,hazaar:1000,hajar:1000,thousand:1000,'ہزار':1000,lakh:100000,lac:100000,'لاکھ':100000};
+const UNITS=/^(kilo|kg|kilu|kelo|litre|liter|ltr|packet|packets|pakt|paket|darjan|dozen|gaz|meter|metre|suit|piece|pieces|pc|pao|bori|botal|bottle|dabba|کلو|لیٹر|پیکٹ|درجن|گز|میٹر|سوٹ|عدد|پاؤ|بوری|بوتل|ڈبہ)$/i;
+const UNITMAP={kg:'kilo',kilu:'kilo',kelo:'kilo',liter:'litre',ltr:'litre',packets:'packet',pakt:'packet',paket:'packet',dozen:'darjan',metre:'meter',pieces:'piece',pc:'piece',bottle:'botal','کلو':'kilo','لیٹر':'litre','پیکٹ':'packet','درجن':'darjan','گز':'gaz','میٹر':'meter','سوٹ':'suit','عدد':'piece','پاؤ':'pao','بوری':'bori','بوتل':'botal','ڈبہ':'dabba'};
+const RX={
+  wapsi:/(wapis|wapas|vapas|vapis|jama|\bada\b|chuka|واپس|جمع|ادا|چکا)/i,
+  kharcha:/(kharcha|kharch|bill|bijli|kiraya|kiraa|tankhwah|salary|خرچ|بل\b|بجلی|کرایہ)/i,
+  stockin:/(\baaya\b|\baayi\b|\baaye\b|\baya\b|\bayi\b|khareed|kharid|mangwa|\bmaal\b|\bmal\b|آیا|آئی|آئے|خرید|مال)/i,
+  udhaar:/(udhaar|udhar|udhari|uddhar|ادھار|le gaya|le gai|le gaye|khate|کھاتے|لے گیا)/i,
+  sale:/(becha|bechi|beche|bika|biki|bike|naqad|nakad|cash|sale|بیچا|بیچی|بیچے|بکا|بکی|نقد)/i};
+const FILLER=new Set('ko ne ka ki ke se aur rupay rupaye rupees rupee rs roopay diya diye de dia kiye kiya kar likh likho gaya gai gaye hai he tha thi udhaar udhar udhari wapis wapas vapas jama ada liya lia le mein main to becha bechi beche bika biki bike naqad nakad cash sale aaya aayi aaye aya ayi maal mal khareeda kharida kharcha kharch mangwaya mangwai hua hui ka kul total par pe کو نے کا کی کے سے اور روپے روپیہ دیا دیے دئیے کیے کیا کر لکھ گیا ہے تھا ادھار واپس جمع ادا لیا لے میں بیچا بیچی بکا بکی نقد آیا آئی آئے مال خرچ'.split(' '));
+
+function toks(t){return t.replace(/[،,.!?؟]/g,' ').replace(/(\d)\s*k\b/gi,(m,a)=>a+'000').replace(/(\d)(kg|kilo)\b/gi,'$1 $2').split(/\s+/).filter(Boolean)}
+function numVal(w){const l=w.toLowerCase().replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
+  if(/^\d+(\.\d+)?$/.test(l))return{n:+l,m:false};
+  if(l in MULT)return{n:MULT[l],m:true};
+  if(NUM[l])return{n:NUM[l],m:false};return null}
+function groups(tk){const out=[];let i=0;
+  while(i<tk.length){if(!numVal(tk[i])){i++;continue}
+    let start=i,total=0,cur=0,mult=false;
+    while(i<tk.length&&numVal(tk[i])){const v=numVal(tk[i]);if(v.m){mult=true;if(v.n>=1000){total+=(cur||1)*v.n;cur=0}else cur=(cur||1)*v.n}else cur+=v.n;i++}
+    out.push({start,end:i,val:total+cur,unit:i<tk.length&&UNITS.test(tk[i])?tk[i]:null,strong:mult||/\d/.test(tk.slice(start,i).join(''))})}
+  return out}
+function lev(a,b){const m=a.length,n=b.length,d=[...Array(n+1).keys()];
+  for(let i=1;i<=m;i++){let p=d[0];d[0]=i;for(let j=1;j<=n;j++){const t=d[j];d[j]=Math.min(d[j]+1,d[j-1]+1,p+(a[i-1]===b[j-1]?0:1));p=t}}return d[n]}
+const norm=s=>String(s||'').toLowerCase().replace(/\s+|bhai|bhaee|sahab|saab|baji|باجی|بھائی|صاحب/g,'').replace(/ee/g,'i').replace(/aa/g,'a').replace(/oo/g,'u').replace(/[wv]/g,'v');
+function sim(a,b){a=norm(a);b=norm(b);if(!a||!b)return 0;if(a===b)return 1;if(a.length>2&&(a.startsWith(b)||b.startsWith(a)))return .9;return 1-lev(a,b)/Math.max(a.length,b.length)}
+function best(list,name,th=.72){let b=null,s=0;for(const x of list){const v=sim(x.name,name);if(v>s){s=v;b=x}}return s>=th?b:null}
+function findItem(tk,skip){let bestM=null;
+  for(const it of S.items){const n=it.name.split(/\s+/).length;
+    for(let i=0;i+n<=tk.length;i++){if([...Array(n).keys()].some(k=>skip.has(i+k)))continue;
+      const s=sim(it.name,tk.slice(i,i+n).join(' '));if(s>=.75&&(!bestM||s>bestM.s))bestM={it,s,start:i,end:i+n}}}
+  return bestM}
+
+function parse(text){
+  const tk=toks(text);const gs=groups(tk);
+  let kind=RX.wapsi.test(text)?'wapsi':RX.kharcha.test(text)?'kharcha':RX.stockin.test(text)?'stockin':RX.udhaar.test(text)?'udhaar':RX.sale.test(text)?'sale':null;
+  const koIdx=tk.findIndex(w=>/^(ko|ne|se|کو|نے|سے)$/i.test(w));
+  if(!kind){kind=koIdx>0?'udhaar':'sale'}
+  if(kind==='udhaar'&&/(\bne\b|نے)/i.test(text)&&/(diye|diya|dia|دیے|دیا|دئیے)/i.test(text)&&!RX.udhaar.test(text))kind='wapsi';
+  const used=new Set();
+  // gahak
+  let name='';
+  if(kind==='udhaar'||kind==='wapsi'){
+    let end=koIdx>0?koIdx:-1;
+    if(end<0){end=0;while(end<tk.length&&end<2&&!numVal(tk[end])&&!S.items.some(it=>sim(it.name,tk[end])>=.8))end++}
+    end=Math.max(1,Math.min(end,3));
+    name=tk.slice(0,end).filter(w=>!numVal(w)).map(w=>w[0].toUpperCase()+w.slice(1)).join(' ');
+    for(let i=0;i<end;i++)used.add(i)}
+  // saman
+  let item=null,qty='',unit='';
+  if(kind!=='wapsi'&&kind!=='kharcha'){
+    const m=findItem(tk,used);
+    if(m){item=m.it;for(let i=m.start;i<m.end;i++)used.add(i)}
+    const qg=gs.find(g=>g.unit)||(m&&gs.find(g=>g.end===m.start&&!g.strong||g.end===m.start&&g.val<100));
+    if(qg){qty=fq(qg.val);unit=qg.unit?(UNITMAP[qg.unit.toLowerCase()]||qg.unit.toLowerCase()):(item?item.unit:'');
+      for(let i=qg.start;i<qg.end+(qg.unit?1:0);i++)used.add(i);qg.used=true}
+    if(item&&!unit)unit=item.unit;
+    if(item&&!qty)qty=1}
+  // raqam
+  const ag=gs.filter(g=>!g.used&&![...Array(g.end-g.start).keys()].some(k=>used.has(g.start+k))).sort((a,b)=>(b.strong-a.strong)||(b.val-a.val))[0];
+  let amount='';
+  if(ag){amount=Math.round(ag.val);for(let i=ag.start;i<ag.end;i++)used.add(i)}
+  else if(item&&qty)amount=Math.round(qty*(kind==='stockin'?item.buy:item.sell));
+  const note=tk.filter((w,i)=>!used.has(i)&&!FILLER.has(w.toLowerCase())&&!(/^(do|دو)$/i.test(w))).join(' ');
+  const cust=name?best(S.customers,name):null;
+  return{raw:text,kind,name:cust?cust.name:name,item:item?item.name:'',qty,unit,amount,note,autoAmt:!ag}}
+
+/* ---------- confirm ---------- */
+$('kinds').innerHTML=Object.entries(KIND).map(([k,v])=>`<button type="button" class="kind" data-k="${k}">${v}</button>`).join('');
+document.querySelectorAll('.kind').forEach(b=>b.onclick=()=>setKind(b.dataset.k));
+function setKind(k){pending.kind=k;document.querySelectorAll('.kind').forEach(b=>b.classList.toggle('on',b.dataset.k===k));
+  $('fCust').hidden=!(k==='udhaar'||k==='wapsi');$('fItem').hidden=(k==='wapsi'||k==='kharcha');itemInfo();checkNew()}
+function showConfirm(p){pending=p;$('confirm').hidden=false;$('cRaw').textContent='Suna: "'+p.raw+'"';
+  $('cName').value=p.name;$('cItem').value=p.item;$('cQty').value=p.qty;$('cUnit').value=p.unit;$('cAmt').value=p.amount;$('cNote').value=p.note;
+  $('cErr').hidden=true;setKind(p.kind);
+  $('confirm').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'center'})}
+function checkNew(){const n=$('cName').value.trim();$('cNew').hidden=$('fCust').hidden||!n||!!best(S.customers,n)}
+function itemInfo(){const it=best(S.items,$('cItem').value.trim(),.75);const el=$('cItemInfo');
+  if($('fItem').hidden||!$('cItem').value.trim()){el.textContent='';return}
+  if(!it){el.textContent='Ye saman stock list mein nahi. Save karne par naya ban jayega.';el.className='small';return}
+  const q=+$('cQty').value||0;const after=pending.kind==='stockin'?it.qty+q:it.qty-q;
+  el.textContent=`Stock: ${fq(it.qty)} ${it.unit} → ${fq(after)} ${it.unit} · qeemat ${rs(it.sell)}/${it.unit}`;
+  el.className='small'+(after<0?' warn':'')}
+['cName'].forEach(i=>$(i).oninput=checkNew);
+$('cItem').oninput=()=>{const it=best(S.items,$('cItem').value.trim(),.9);if(it&&!$('cUnit').value)$('cUnit').value=it.unit;recalc();itemInfo()};
+$('cQty').oninput=()=>{recalc();itemInfo()};
+$('cAmt').oninput=()=>{pending.autoAmt=false};
+function recalc(){if(!pending.autoAmt)return;const it=best(S.items,$('cItem').value.trim(),.75);const q=+$('cQty').value;
+  if(it&&q)$('cAmt').value=Math.round(q*(pending.kind==='stockin'?it.buy:it.sell))}
+$('cNo').onclick=()=>{$('confirm').hidden=true;pending=null};
+$('cOk').onclick=()=>{
+  const k=pending.kind,name=$('cName').value.trim(),iname=$('cItem').value.trim(),qty=fq($('cQty').value),unit=$('cUnit').value.trim();
+  const amt=Math.round(+String($('cAmt').value).replace(/[^\d.]/g,''));
+  const err=m=>{$('cErr').textContent=m;$('cErr').hidden=false};
+  if((k==='udhaar'||k==='wapsi')&&!name)return err('Gahak ka naam likhein.');
+  if(!amt)return err('Raqam likhein.');
+  const undo={made:[]};
+  let cid=null,iid=null;
+  if(k==='udhaar'||k==='wapsi'){let c=best(S.customers,name);if(!c){c={id:uid(),name};S.customers.push(c);undo.made.push(['customers',c.id])}cid=c.id}
+  if(iname&&k!=='wapsi'&&k!=='kharcha'){let it=best(S.items,iname,.75);
+    if(!it){it={id:uid(),name:iname[0].toUpperCase()+iname.slice(1),unit:unit||'piece',buy:k==='stockin'&&qty?Math.round(amt/qty):0,sell:k!=='stockin'&&qty?Math.round(amt/qty):0,qty:0,low:0};S.items.push(it);undo.made.push(['items',it.id])}
+    iid=it.id;if(qty){it.qty=fq(it.qty+(k==='stockin'?qty:-qty));undo.stock={iid,delta:k==='stockin'?qty:-qty}}}
+  const e={id:uid(),kind:k,ts:Date.now(),cid,iid,qty:iid?qty:0,unit:iid?unit:'',amount:amt,note:$('cNote').value.trim(),raw:pending.raw};
+  S.entries.push(e);undo.eid=e.id;lastSaved=undo;save();
+  $('confirm').hidden=true;pending=null;$('heard').textContent='';
+  toast(KIND[k]+': '+(cid?cname(cid)+' ':'')+(iid?fq(qty)+' '+unit+' '+iname+' ':'')+rs(amt));render()};
+
+let tt;function toast(m,undo=true){$('toastMsg').textContent=m;$('toastUndo').hidden=!undo;$('toast').hidden=false;clearTimeout(tt);tt=setTimeout(()=>$('toast').hidden=true,5000)}
+$('toastUndo').onclick=()=>{const u=lastSaved;if(!u)return;S.entries=S.entries.filter(e=>e.id!==u.eid);
+  if(u.stock){const it=S.items.find(i=>i.id===u.stock.iid);if(it)it.qty=fq(it.qty-u.stock.delta)}
+  u.made.forEach(([col,id])=>S[col]=S[col].filter(x=>x.id!==id));lastSaved=null;save();$('toast').hidden=true;render()};
+function removeEntry(id){const e=S.entries.find(x=>x.id===id);if(!e)return;
+  if(e.iid&&e.qty){const it=S.items.find(i=>i.id===e.iid);if(it)it.qty=fq(it.qty+(e.kind==='stockin'?-e.qty:e.qty))}
+  S.entries=S.entries.filter(x=>x.id!==id);save();render()}
+
+/* ---------- input ---------- */
+$('typeForm').onsubmit=e=>{e.preventDefault();const v=$('typeIn').value.trim();if(!v)return;showConfirm(parse(v));$('typeIn').value=''};
+['2 kilo cheeni bechi','Aslam ko 2 packet ghee udhaar','Bilal ne 300 wapis kiye','50 kilo atta aaya 5200 ka','200 ka bijli bill kharcha'].forEach(t=>{
+  const b=document.createElement('button');b.className='pill';b.type='button';b.textContent=t;b.onclick=()=>showConfirm(parse(t));$('chips').appendChild(b)});
+document.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>{micLang=b.dataset.l;document.querySelectorAll('[data-l]').forEach(x=>x.classList.toggle('on',x===b))});
+function hint(t,warn){$('micHint').textContent=t;$('micHint').classList.toggle('warn',!!warn)}
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let rec=null,live=false;
+$('micBtn').onclick=()=>{
+  if(!navigator.onLine){hint('Internet nahi hai. Mic ko internet chahiye; neeche likh kar entry karein, sab save hoga.',true);$('typeIn').focus();return}
+  if(!SR){hint('Is browser mein awaz ki suvidha nahi. Phone par Chrome mein kholein, ya neeche likhein.',true);return}
+  if(live){rec&&rec.stop();return}
+  rec=new SR();rec.lang=micLang;rec.interimResults=true;rec.maxAlternatives=1;
+  rec.onstart=()=>{live=true;$('micBtn').classList.add('live');hint('Sun raha hoon... bolein');$('heard').textContent=''};
+  rec.onresult=ev=>{let t='';for(const r of ev.results)t+=r[0].transcript;$('heard').textContent=t;if(ev.results[ev.results.length-1].isFinal)showConfirm(parse(t))};
+  rec.onerror=ev=>{const m={'not-allowed':'Mic ki ijazat nahi mili. Is preview mein mic band hai; asli link par chalega.','service-not-allowed':'Mic ki ijazat nahi mili. Is preview mein mic band hai; asli link par chalega.','network':'Awaz samajhne ke liye internet chahiye. Neeche likh kar entry karein.','no-speech':'Kuch suna nahi, dobara bolein.','audio-capture':'Mic nahi mila. Phone ka mic check karein.'};hint(m[ev.error]||'Awaz samajh nahi aayi, dobara bolein.',true)};
+  rec.onend=()=>{live=false;$('micBtn').classList.remove('live');if($('micHint').textContent.startsWith('Sun'))hint('Mic dabayein aur bolein')};
+  try{rec.start()}catch(e){hint('Mic shuru nahi ho saka. Neeche likh kar aazmayein.',true)}};
+
+/* ---------- helpers ---------- */
+const cname=id=>(S.customers.find(c=>c.id===id)||{}).name||'?';
+const iname=id=>(S.items.find(c=>c.id===id)||{}).name||'';
+const bal=cid=>S.entries.filter(e=>e.cid===cid).reduce((s,e)=>s+(e.kind==='udhaar'?e.amount:e.kind==='wapsi'?-e.amount:0),0);
+const time=ts=>new Date(ts).toLocaleTimeString('en-PK',{hour:'numeric',minute:'2-digit'});
+const day=ts=>new Date(ts).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+const dkey=ts=>{const d=new Date(ts);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const isLow=it=>it.low>0&&it.qty<=it.low;
+function entryLine(e){const parts=[];if(e.cid)parts.push(cname(e.cid));if(e.iid)parts.push((e.qty?fq(e.qty)+' '+e.unit+' ':'')+iname(e.iid));
+  return{title:parts[0]||(e.note||KIND[e.kind]),sub:[parts.slice(1).join(' '),e.note&&parts.length?e.note:'',time(e.ts)].filter(Boolean).join(' · ')}}
+function li(html){const l=document.createElement('li');l.innerHTML=html;return l}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function dayReport(key){
+  const es=S.entries.filter(e=>dkey(e.ts)===key);const sum=k=>es.filter(e=>e.kind===k).reduce((s,e)=>s+e.amount,0);
+  const cash=sum('sale'),udh=sum('udhaar'),wap=sum('wapsi'),khar=sum('kharcha'),stk=sum('stockin');
+  let cost=0;const top={};
+  es.filter(e=>(e.kind==='sale'||e.kind==='udhaar')&&e.iid).forEach(e=>{const it=S.items.find(i=>i.id===e.iid);if(it)cost+=(it.buy||0)*e.qty;
+    const t=top[e.iid]||(top[e.iid]={qty:0,amt:0});t.qty+=e.qty;t.amt+=e.amount});
+  const itemSales=es.filter(e=>(e.kind==='sale'||e.kind==='udhaar')&&e.iid).reduce((s,e)=>s+e.amount,0);
+  return{es,cash,udh,wap,khar,stk,sale:cash+udh,galla:cash+wap-khar,profit:itemSales-cost-khar,top:Object.entries(top).sort((a,b)=>b[1].amt-a[1].amt)}}
+
+/* ---------- render ---------- */
+function render(){
+  $('demoBar').hidden=!S.demo;
+  const r=dayReport(dkey(Date.now()));
+  $('sSale').textContent=rs(r.sale);$('sCash').textContent=rs(r.galla);
+  $('sUdh').textContent=rs(S.customers.reduce((s,c)=>s+Math.max(0,bal(c.id)),0));
+  $('custNames').innerHTML=S.customers.map(c=>`<option value="${esc(c.name)}">`).join('');
+  $('itemNames').innerHTML=S.items.map(c=>`<option value="${esc(c.name)}">`).join('');
+  const tl=$('todayList');tl.innerHTML='';
+  const todays=r.es.slice().sort((a,b)=>b.ts-a.ts);
+  if(!todays.length)tl.appendChild(li('<span class="empty" style="flex:1">Aaj abhi koi entry nahi. Mic daba kar pehli likhwayein.</span>'));
+  todays.forEach(e=>{const L=entryLine(e);const l=li(`<div class="who"><b></b><small></small></div><span class="tag ${e.kind}">${KIND[e.kind]}</span><span class="amt num">${rs(e.amount)}</span>`);
+    l.querySelector('b').textContent=L.title;l.querySelector('small').textContent=L.sub;tl.appendChild(l)});
+  renderStock();renderCust();renderReport();
+}
+function renderStock(){
+  $('stCount').textContent=S.items.length;$('stLow').textContent=S.items.filter(isLow).length;
+  $('stVal').textContent=rs(S.items.reduce((s,i)=>s+Math.max(0,i.qty)*(i.buy||0),0));
+  const q=norm($('sq').value);const ul=$('stockList');ul.innerHTML='';
+  const list=S.items.filter(i=>!q||norm(i.name).includes(q)).sort((a,b)=>(isLow(b)-isLow(a))||a.name.localeCompare(b.name));
+  if(!list.length){ul.appendChild(li('<span class="empty" style="flex:1">Koi saman nahi. Neeche se add karein.</span>'));return}
+  list.forEach(it=>{const l=document.createElement('li');l.style.display='block';
+    const b=document.createElement('button');b.className='rowbtn';b.setAttribute('aria-expanded',openItem===it.id);
+    b.innerHTML=`<div class="who"><b></b><small>${rs(it.sell)} / ${esc(it.unit)}</small></div>${isLow(it)?'<span class="tag low">Kam hai</span>':''}<span class="amt num ${it.qty<0?'c-udhaar':''}">${fq(it.qty)} <small style="font-weight:400;font-size:13px">${esc(it.unit)}</small></span>`;
+    b.querySelector('b').textContent=it.name;b.onclick=()=>{openItem=openItem===it.id?null:it.id;renderStock()};l.appendChild(b);
+    if(openItem===it.id){const x=document.createElement('div');x.className='expand';
+      x.innerHTML=`<div class="grid2">
+        <div class="field"><label for="e_buy_${it.id}">Khareed qeemat</label><input id="e_buy_${it.id}" inputmode="numeric" value="${it.buy}"></div>
+        <div class="field"><label for="e_sell_${it.id}">Bechne ki qeemat</label><input id="e_sell_${it.id}" inputmode="numeric" value="${it.sell}"></div>
+        <div class="field"><label for="e_qty_${it.id}">Stock (ginti)</label><input id="e_qty_${it.id}" inputmode="decimal" value="${fq(it.qty)}"></div>
+        <div class="field"><label for="e_low_${it.id}">Kam hone par batao</label><input id="e_low_${it.id}" inputmode="decimal" value="${it.low}"></div></div>
+        <div class="grid2"><button class="btn primary" type="button" data-a="save">Save</button><button class="btn" type="button" data-a="del">Saman hatayein</button></div>`;
+      x.querySelector('[data-a=save]').onclick=()=>{it.buy=+$('e_buy_'+it.id).value||0;it.sell=+$('e_sell_'+it.id).value||0;it.qty=fq($('e_qty_'+it.id).value);it.low=+$('e_low_'+it.id).value||0;save();openItem=null;toast(it.name+' update ho gaya',false);render()};
+      const del=x.querySelector('[data-a=del]');del.onclick=()=>{if(del.dataset.sure){S.items=S.items.filter(i=>i.id!==it.id);save();openItem=null;render()}else{del.dataset.sure=1;del.textContent='Pakka hatayein?';del.style.color='var(--udhaar)'}};
+      l.appendChild(x)}
+    ul.appendChild(l)});
+}
+$('sq').oninput=renderStock;
+$('addItem').onsubmit=e=>{e.preventDefault();const n=$('iName').value.trim();
+  if(!n){$('iErr').textContent='Saman ka naam likhein.';$('iErr').hidden=false;return}
+  if(best(S.items,n,.95)){$('iErr').textContent='Ye saman pehle se list mein hai.';$('iErr').hidden=false;return}
+  S.items.push({id:uid(),name:n[0].toUpperCase()+n.slice(1),unit:$('iUnit').value.trim()||'piece',buy:+$('iBuy').value||0,sell:+$('iSell').value||0,qty:fq($('iQty').value),low:+$('iLow').value||0});
+  save();e.target.reset();$('iErr').hidden=true;toast(n+' add ho gaya',false);render()};
+
+function renderCust(){
+  const q=norm($('q').value);const ul=$('custList');ul.innerHTML='';
+  const cs=S.customers.map(c=>({c,b:bal(c.id)})).filter(x=>!q||norm(x.c.name).includes(q)).sort((a,b)=>b.b-a.b);
+  if(!cs.length){ul.appendChild(li('<span class="empty" style="flex:1">Koi gahak nahi mila.</span>'));return}
+  cs.forEach(({c,b})=>{const l=document.createElement('li');l.style.display='block';
+    const btn=document.createElement('button');btn.className='rowbtn';btn.setAttribute('aria-expanded',openCust===c.id);
+    btn.innerHTML=`<div class="who"><b></b><small>${b>0?'Baqi':b<0?'Advance':'Hisaab saaf'}</small></div><span class="amt num ${b>0?'c-udhaar':'c-wapsi'}">${rs(Math.abs(b))}</span>`;
+    btn.querySelector('b').textContent=c.name;btn.onclick=()=>{openCust=openCust===c.id?null:c.id;renderCust()};l.appendChild(btn);
+    if(openCust===c.id){const h=document.createElement('div');h.className='expand hist';
+      S.entries.filter(e=>e.cid===c.id).sort((a,b)=>b.ts-a.ts).forEach(e=>{const r=document.createElement('div');
+        r.innerHTML=`<span></span><span style="display:flex;gap:8px;align-items:center"><span class="num ${e.kind==='udhaar'?'c-udhaar':'c-wapsi'}" style="font-weight:700">${e.kind==='udhaar'?'+':'−'}${rs(e.amount)}</span><button class="x">Mitayein</button></span>`;
+        r.firstChild.textContent=day(e.ts)+(e.iid?' · '+fq(e.qty)+' '+e.unit+' '+iname(e.iid):'')+(e.note?' · '+e.note:'');
+        const x=r.querySelector('.x');x.onclick=ev=>{ev.stopPropagation();if(x.dataset.sure)removeEntry(e.id);else{x.dataset.sure=1;x.textContent='Pakka?';x.style.color='var(--udhaar)'}};
+        h.appendChild(r)});l.appendChild(h)}
+    ul.appendChild(l)});
+}
+$('q').oninput=renderCust;
+
+function renderReport(){
+  if(!$('rDate').value)$('rDate').value=dkey(Date.now());
+  const r=dayReport($('rDate').value);
+  const st=(label,val,cls,big)=>`<div class="stat ${big?'big':''}"><small>${label}</small><b class="num ${cls}">${rs(val)}</b></div>`;
+  $('repStats').innerHTML=st('Kul sale (naqad + udhaar)',r.sale,'c-sale',true)+st('Galle mein cash',r.galla,'c-wapsi')+st('Andaza munafa',r.profit,r.profit<0?'c-udhaar':'c-wapsi');
+  const kv=(a,b,cls='')=>`<div class="kv"><span>${a}</span><b class="num ${cls}">${b}</b></div>`;
+  $('repKv').innerHTML=kv('Naqad sale',rs(r.cash),'c-sale')+kv('Udhaar par diya',rs(r.udh),'c-udhaar')+kv('Udhaar wapis aaya',rs(r.wap),'c-wapsi')+kv('Kharcha',rs(r.khar),'c-kharcha')+kv('Maal khareeda',rs(r.stk),'c-stock')+kv('Kul entries',r.es.length);
+  $('repTop').innerHTML=r.top.length?r.top.slice(0,5).map(([id,t])=>{const it=S.items.find(i=>i.id===id)||{};return kv(esc((it.name||'?'))+' <span class="small">'+fq(t.qty)+' '+esc(it.unit||'')+'</span>',rs(t.amt))}).join(''):'<p class="small" style="margin:0">Is din saman wali koi sale nahi.</p>';
+  const low=S.items.filter(isLow);
+  $('repLow').innerHTML=low.length?low.map(i=>kv(esc(i.name),fq(i.qty)+' '+esc(i.unit)+' baqi','c-udhaar')).join(''):'<p class="small" style="margin:0">Sab saman kaafi hai.</p>';
+}
+$('rDate').onchange=renderReport;
+$('rCopy').onclick=async()=>{const k=$('rDate').value,r=dayReport(k);
+  const lines=[`*Bolta Khata — ${new Date(k).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}*`,`Kul sale: ${rs(r.sale)}`,`Naqad: ${rs(r.cash)} | Udhaar: ${rs(r.udh)}`,`Udhaar wapis: ${rs(r.wap)}`,`Kharcha: ${rs(r.khar)}`,`Galle mein cash: ${rs(r.galla)}`,`Andaza munafa: ${rs(r.profit)}`];
+  const low=S.items.filter(isLow);if(low.length)lines.push('Mangwana hai: '+low.map(i=>i.name).join(', '));
+  const txt=lines.join('\n');
+  try{await navigator.clipboard.writeText(txt);toast('Report copy ho gayi. WhatsApp mein paste karein.',false)}catch(e){toast('Copy nahi hui. Report screen ka screenshot le lein.',false)}};
+
+/* ---------- backup ---------- */
+$('bkSave').onclick=()=>{try{const blob=new Blob([JSON.stringify(S)],{type:'application/json'});const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download='bolta-khata-backup-'+dkey(Date.now())+'.json';document.body.appendChild(a);a.click();a.remove();
+  $('bkMsg').textContent='Backup file ban gayi (Downloads mein dekhein). Is preview mein download band hai, asli link par chalega.'}catch(e){$('bkMsg').textContent='Backup nahi ban saka.'}};
+$('bkLoad').onchange=e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();
+  rd.onload=()=>{try{const d=JSON.parse(rd.result);if(!d.entries||!d.items)throw 0;S=d;save();render();$('bkMsg').textContent='Backup wapis aa gaya: '+d.entries.length+' entries.'}catch(err){$('bkMsg').textContent='Ye sahi backup file nahi.'}};rd.readAsText(f)};
+
+/* ---------- tabs, online status, offline ---------- */
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));
+  ['aaj','stock','gahak','report'].forEach(p=>$('p-'+p).hidden=p!==b.dataset.p);if(b.dataset.p==='report')renderReport();scrollTo(0,0)});
+function net(){const on=navigator.onLine;$('netDot').classList.toggle('off',!on);$('netTxt').textContent=on?'Online':'Offline: sab save ho raha hai'}
+addEventListener('online',net);addEventListener('offline',net);
+$('clearDemo').onclick=()=>{S={items:[],customers:[],entries:[],demo:false};save();render()};
+$('today').textContent=new Date().toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
+if('serviceWorker' in navigator&&location.protocol==='https:'){navigator.serviceWorker.register('sw.js').catch(()=>{})}
+(async()=>{const d=await load();if(d&&d.items)S=d;else{seed();save()}net();render()})();
+</script>
+
+</body></html>
