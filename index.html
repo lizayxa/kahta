@@ -132,7 +132,8 @@ nav button.on{color:var(--accent);border-top-color:var(--accent)}
       <button class="mic" id="micBtn" aria-label="Bol kar likhwayein">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg>
       </button>
-      <div class="pills" role="group" aria-label="Mic ki zabaan"><span>Mic likhe:</span>
+      <div class="pills"><span id="engTxt">Mic: Online</span></div>
+      <div class="pills" role="group" aria-label="Mic ki zabaan" id="langPills"><span>Mic likhe:</span>
         <button type="button" class="pill on" data-l="en-IN">Roman</button><button type="button" class="pill" data-l="ur-PK">اردو</button></div>
       <p class="hint" id="micHint">Bolein: "2 kilo cheeni bechi" ya "Aslam ko 500 udhaar"</p>
       <p class="heard" id="heard" aria-live="polite"></p>
@@ -211,6 +212,12 @@ nav button.on{color:var(--accent);border-top-color:var(--accent)}
     <div class="panel"><h3>Hisaab ki tafseel</h3><div id="repKv"></div></div>
     <div class="panel"><h3>Sabse zyada bika</h3><div id="repTop"></div></div>
     <div class="panel"><h3>Ye saman mangwana hai</h3><div id="repLow"></div></div>
+    <div class="panel"><h3>Offline awaz</h3>
+      <p class="small" style="margin:0">Is se mic bina internet ke bhi chalega. Ek dafa internet par download karein (taqreeban 45MB), phir hamesha phone mein rahega.</p>
+      <p style="margin:0" id="vkStatus">Abhi download nahi hua.</p>
+      <button class="btn primary" id="vkGet" type="button">Offline awaz download karein</button>
+      <label class="small" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="vkForce" style="width:auto;min-height:0"> Internet ho tab bhi offline mic use karo (testing ke liye)</label>
+    </div>
     <div class="panel"><h3>Backup</h3>
       <p class="small" style="margin:0">Saara data phone mein save hai. Hafte mein ek dafa backup file bana kar WhatsApp par khud ko bhej dein.</p>
       <div class="grid2"><button class="btn" id="bkSave" type="button">Backup banayein</button><label class="btn" style="text-align:center">Backup wapis lein<input type="file" id="bkLoad" accept=".json,application/json" class="sr"></label></div>
@@ -273,17 +280,46 @@ function seed(){
 const NUM={ek:1,aik:1,ik:1,one:1,do:2,two:2,teen:3,tin:3,char:4,chaar:4,panch:5,paanch:5,panj:5,chhe:6,chay:6,che:6,saat:7,sat:7,aath:8,ath:8,nau:9,das:10,dus:10,gyarah:11,barah:12,pandrah:15,bees:20,bis:20,pachees:25,tees:30,chalees:40,pachaas:50,pachas:50,sattar:70,assi:80,nabbe:90,dedh:1.5,derh:1.5,dhai:2.5,dhaai:2.5,adha:.5,aadha:.5,
  'ایک':1,'دو':2,'تین':3,'چار':4,'پانچ':5,'چھ':6,'چھے':6,'سات':7,'آٹھ':8,'نو':9,'دس':10,'گیارہ':11,'بارہ':12,'پندرہ':15,'بیس':20,'پچیس':25,'تیس':30,'چالیس':40,'پچاس':50,'ساٹھ':60,'ستر':70,'اسی':80,'نوے':90,'ڈیڑھ':1.5,'ڈھائی':2.5,'آدھا':.5};
 const MULT={sau:100,so:100,hundred:100,'سو':100,hazar:1000,hazaar:1000,hajar:1000,thousand:1000,'ہزار':1000,lakh:100000,lac:100000,'لاکھ':100000};
-const UNITS=/^(kilo|kg|kilu|kelo|litre|liter|ltr|packet|packets|pakt|paket|darjan|dozen|gaz|meter|metre|suit|piece|pieces|pc|pao|bori|botal|bottle|dabba|کلو|لیٹر|پیکٹ|درجن|گز|میٹر|سوٹ|عدد|پاؤ|بوری|بوتل|ڈبہ)$/i;
-const UNITMAP={kg:'kilo',kilu:'kilo',kelo:'kilo',liter:'litre',ltr:'litre',packets:'packet',pakt:'packet',paket:'packet',dozen:'darjan',metre:'meter',pieces:'piece',pc:'piece',bottle:'botal','کلو':'kilo','لیٹر':'litre','پیکٹ':'packet','درجن':'darjan','گز':'gaz','میٹر':'meter','سوٹ':'suit','عدد':'piece','پاؤ':'pao','بوری':'bori','بوتل':'botal','ڈبہ':'dabba'};
+const UNITS=/^(kilo|kg|kilu|kelo|litre|liter|ltr|litar|packet|packets|pakt|paket|paiket|darjan|dozen|gaz|meter|metre|mitar|suit|sut|piece|pieces|pc|pis|pao|pav|bori|botal|bottle|dabba|dibba|کلو|لیٹر|پیکٹ|درجن|گز|میٹر|سوٹ|عدد|پاؤ|بوری|بوتل|ڈبہ)$/i;
+const UNITMAP={paiket:'packet',litar:'litre',mitar:'meter',pav:'pao',pis:'piece',sut:'suit',dibba:'dabba',kg:'kilo',kilu:'kilo',kelo:'kilo',liter:'litre',ltr:'litre',packets:'packet',pakt:'packet',paket:'packet',dozen:'darjan',metre:'meter',pieces:'piece',pc:'piece',bottle:'botal','کلو':'kilo','لیٹر':'litre','پیکٹ':'packet','درجن':'darjan','گز':'gaz','میٹر':'meter','سوٹ':'suit','عدد':'piece','پاؤ':'pao','بوری':'bori','بوتل':'botal','ڈبہ':'dabba'};
 const RX={
   wapsi:/(wapis|wapas|vapas|vapis|jama|\bada\b|chuka|واپس|جمع|ادا|چکا)/i,
   kharcha:/(kharcha|kharch|bill|bijli|kiraya|kiraa|tankhwah|salary|خرچ|بل\b|بجلی|کرایہ)/i,
-  stockin:/(\baaya\b|\baayi\b|\baaye\b|\baya\b|\bayi\b|khareed|kharid|mangwa|\bmaal\b|\bmal\b|آیا|آئی|آئے|خرید|مال)/i,
+  stockin:/(\baaya\b|\baayi\b|\baaye\b|\baya\b|\bayi\b|\bai\b|\bae\b|khareed|kharid|mangwa|\bmaal\b|\bmal\b|آیا|آئی|آئے|خرید|مال)/i,
   udhaar:/(udhaar|udhar|udhari|uddhar|ادھار|le gaya|le gai|le gaye|khate|کھاتے|لے گیا)/i,
   sale:/(becha|bechi|beche|bika|biki|bike|naqad|nakad|cash|sale|بیچا|بیچی|بیچے|بکا|بکی|نقد)/i};
-const FILLER=new Set('ko ne ka ki ke se aur rupay rupaye rupees rupee rs roopay diya diye de dia kiye kiya kar likh likho gaya gai gaye hai he tha thi udhaar udhar udhari wapis wapas vapas jama ada liya lia le mein main to becha bechi beche bika biki bike naqad nakad cash sale aaya aayi aaye aya ayi maal mal khareeda kharida kharcha kharch mangwaya mangwai hua hui ka kul total par pe کو نے کا کی کے سے اور روپے روپیہ دیا دیے دئیے کیے کیا کر لکھ گیا ہے تھا ادھار واپس جمع ادا لیا لے میں بیچا بیچی بکا بکی نقد آیا آئی آئے مال خرچ'.split(' '));
+const FILLER=new Set('rupye rupae rupaye die kie gae hain hai diya liya ko ne ka ki ke se aur rupay rupaye rupees rupee rs roopay diya diye de dia kiye kiya kar likh likho gaya gai gaye hai he tha thi udhaar udhar udhari wapis wapas vapas jama ada liya lia le mein main to becha bechi beche bika biki bike naqad nakad cash sale aaya aayi aaye aya ayi maal mal khareeda kharida kharcha kharch mangwaya mangwai hua hui ka kul total par pe کو نے کا کی کے سے اور روپے روپیہ دیا دیے دئیے کیے کیا کر لکھ گیا ہے تھا ادھار واپس جمع ادا لیا لے میں بیچا بیچی بکا بکی نقد آیا آئی آئے مال خرچ'.split(' '));
 
-function toks(t){return t.replace(/[،,.!?؟]/g,' ').replace(/(\d)\s*k\b/gi,(m,a)=>a+'000').replace(/(\d)(kg|kilo)\b/gi,'$1 $2').split(/\s+/).filter(Boolean)}
+/* ---------- Hindi (Devanagari) -> Roman, offline mic ke liye ---------- */
+const dn=w=>w.normalize('NFC').replace(/ँ/g,'ं').replace(/न्(?=[क-ह])/g,'ं').replace(/ः/g,'ह');
+const DEVA_NUM=(()=>{const m={};
+  'एक दो तीन चार पांच छह सात आठ नौ दस ग्यारह बारह तेरह चौदह पंद्रह सोलह सत्रह अठारह उन्नीस बीस इक्कीस बाईस तेईस चौबीस पच्चीस छब्बीस सत्ताईस अट्ठाईस उनतीस तीस इकतीस बत्तीस तैंतीस चौंतीस पैंतीस छत्तीस सैंतीस अड़तीस उनतालीस चालीस इकतालीस बयालीस तैंतालीस चवालीस पैंतालीस छियालीस सैंतालीस अड़तालीस उनचास पचास इक्यावन बावन तिरपन चौवन पचपन छप्पन सत्तावन अट्ठावन उनसठ साठ इकसठ बासठ तिरसठ चौंसठ पैंसठ छियासठ सड़सठ अड़सठ उनहत्तर सत्तर इकहत्तर बहत्तर तिहत्तर चौहत्तर पचहत्तर छिहत्तर सतहत्तर अठहत्तर उन्यासी अस्सी इक्यासी बयासी तिरासी चौरासी पचासी छियासी सत्तासी अट्ठासी नवासी नब्बे इक्यानवे बानवे तिरानवे चौरानवे पचानवे छियानवे सत्तानवे अट्ठानवे निन्यानवे'
+    .split(' ').forEach((w,i)=>m[dn(w)]=i+1);
+  [['छे',6],['डेढ़',1.5],['ढाई',2.5],['आधा',.5],['आधी',.5],['सवा',1.25]].forEach(([w,n])=>m[dn(w)]=n);return m})();
+const DV={'अ':'a','आ':'aa','इ':'i','ई':'ee','उ':'u','ऊ':'oo','ऋ':'ri','ए':'e','ऐ':'ai','ओ':'o','औ':'au','ऑ':'o','ऍ':'e'};
+const DM={'ा':'aa','ि':'i','ी':'ee','ु':'u','ू':'oo','ृ':'ri','े':'e','ै':'ai','ो':'o','ौ':'au','ॉ':'o','ॅ':'e'};
+const DC={'क':'k','ख':'kh','ग':'g','घ':'gh','ङ':'n','च':'ch','छ':'chh','ज':'j','झ':'jh','ञ':'n','ट':'t','ठ':'th','ड':'d','ढ':'dh','ण':'n','त':'t','थ':'th','द':'d','ध':'dh','न':'n','प':'p','फ':'ph','ब':'b','भ':'bh','म':'m','य':'y','र':'r','ल':'l','व':'w','श':'sh','ष':'sh','स':'s','ह':'h'};
+const DNK={'क':'q','ख':'kh','ग':'gh','ज':'z','फ':'f','ड':'r','ढ':'rh'};
+function devaWord(w){
+  w=w.normalize('NFC');const seq=[];
+  for(let i=0;i<w.length;i++){const ch=w[i];
+    if(DC[ch]){let c=DC[ch];if(w[i+1]==='़'){c=DNK[ch]||c;i++}
+      seq.push({c});const nx=w[i+1];
+      if(nx==='्'){i++}else if(DM[nx]){seq.push({v:DM[nx]});i++}else seq.push({v:'a',inh:true});
+      continue}
+    if(DV[ch]){seq.push({v:DV[ch]});continue}
+    if(ch==='ं'||ch==='ँ'){seq.push({n:'n'});continue}
+    if(ch==='ः'){seq.push({c:'h'});continue}
+    const d='०१२३४५६७८९'.indexOf(ch);if(d>=0)seq.push({n:String(d)});else if(/[0-9a-z]/i.test(ch))seq.push({n:ch})}
+  const isC=x=>x&&x.c!==undefined,isV=x=>x&&x.v!==undefined;
+  if(seq.length&&seq[seq.length-1].inh&&seq.filter(isV).length>1)seq.pop();
+  for(let i=seq.length-2;i>=2;i--){if(seq[i].inh&&isC(seq[i-1])&&isV(seq[i-2])&&isC(seq[i+1])&&isV(seq[i+2])){seq.splice(i,1);i--}}
+  return seq.map(x=>x.c??x.v??x.n).join('').replace(/aa/g,'a').replace(/ee/g,'i').replace(/oo/g,'u')}
+function devaToRoman(t){
+  if(!/[ऀ-ॿ]/.test(t))return t;
+  return t.split(/\s+/).filter(Boolean).map(w=>{if(!/[ऀ-ॿ]/.test(w))return w;const n=DEVA_NUM[dn(w)];return n!==undefined?String(n):devaWord(w)}).join(' ')}
+
+function toks(t){return t.replace(/[،,!?؟]|\.(?!\d)/g,' ').replace(/(\d)\s*k\b/gi,(m,a)=>a+'000').replace(/(\d)(kg|kilo)\b/gi,'$1 $2').split(/\s+/).filter(Boolean)}
 function numVal(w){const l=w.toLowerCase().replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
   if(/^\d+(\.\d+)?$/.test(l))return{n:+l,m:false};
   if(l in MULT)return{n:MULT[l],m:true};
@@ -310,16 +346,17 @@ function parse(text){
   let kind=RX.wapsi.test(text)?'wapsi':RX.kharcha.test(text)?'kharcha':RX.stockin.test(text)?'stockin':RX.udhaar.test(text)?'udhaar':RX.sale.test(text)?'sale':null;
   const koIdx=tk.findIndex(w=>/^(ko|ne|se|کو|نے|سے)$/i.test(w));
   if(!kind){kind=koIdx>0?'udhaar':'sale'}
-  if(kind==='udhaar'&&/(\bne\b|نے)/i.test(text)&&/(diye|diya|dia|دیے|دیا|دئیے)/i.test(text)&&!RX.udhaar.test(text))kind='wapsi';
+  if(kind==='udhaar'&&/(\bne\b|نے)/i.test(text)&&/(diye|diya|dia|\bdie\b|دیے|دیا|دئیے)/i.test(text)&&!RX.udhaar.test(text))kind='wapsi';
   const used=new Set();
   // gahak
   let name='';
   if(kind==='udhaar'||kind==='wapsi'){
-    let end=koIdx>0?koIdx:-1;
-    if(end<0){end=0;while(end<tk.length&&end<2&&!numVal(tk[end])&&!S.items.some(it=>sim(it.name,tk[end])>=.8))end++}
-    end=Math.max(1,Math.min(end,3));
-    name=tk.slice(0,end).filter(w=>!numVal(w)).map(w=>w[0].toUpperCase()+w.slice(1)).join(' ');
-    for(let i=0;i<end;i++)used.add(i)}
+    const okName=w=>!numVal(w)&&!FILLER.has(w.toLowerCase())&&!UNITS.test(w)&&!RX.udhaar.test(w)&&!RX.wapsi.test(w)&&!S.items.some(it=>sim(it.name,w)>=.8);
+    let idx=[];
+    if(koIdx>0){for(let i=koIdx-1;i>=0&&idx.length<2&&okName(tk[i]);i--)idx.unshift(i)}
+    if(!idx.length){for(let i=0;i<tk.length&&idx.length<2&&okName(tk[i]);i++)idx.push(i)}
+    name=idx.map(i=>tk[i][0].toUpperCase()+tk[i].slice(1)).join(' ');
+    idx.forEach(i=>used.add(i))}
   // saman
   let item=null,qty='',unit='';
   if(kind!=='wapsi'&&kind!=='kharcha'){
@@ -394,15 +431,68 @@ $('typeForm').onsubmit=e=>{e.preventDefault();const v=$('typeIn').value.trim();i
 document.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>{micLang=b.dataset.l;document.querySelectorAll('[data-l]').forEach(x=>x.classList.toggle('on',x===b))});
 function hint(t,warn){$('micHint').textContent=t;$('micHint').classList.toggle('warn',!!warn)}
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let rec=null,live=false;
+
+/* ---------- offline mic: Vosk ---------- */
+const VK_URL=new URL('models/vosk-model-small-hi-0.22.tar.gz',location.href).toString();
+const lsGet=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
+const lsSet=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+let vkModel=null,vkLoading=null,vk=null;
+const vkReady=()=>lsGet('vk-ready')==='1';
+function loadScript(src){return new Promise((res,rej)=>{if(window.Vosk)return res();const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=()=>rej(new Error('script'));document.head.appendChild(s)})}
+function vkLoad(){
+  if(vkModel)return Promise.resolve(vkModel);
+  if(vkLoading)return vkLoading;
+  vkLoading=(async()=>{await loadScript('vosk.js');const m=await Vosk.createModel(VK_URL);vkModel=m;lsSet('vk-ready','1');return m})()
+    .catch(e=>{vkLoading=null;throw e});
+  return vkLoading}
+function useOffline(){return $('vkForce').checked||!navigator.onLine||!SR}
+function engineLabel(){const off=useOffline();$('engTxt').textContent=off?(vkReady()?'Mic: Offline (phone ke andar)':'Mic: Offline awaz download nahi hui'):'Mic: Online (Google)';
+  $('langPills').hidden=off;
+  $('vkStatus').textContent=vkReady()?'Download ho chuki hai. Mic bina internet ke chalega.':'Abhi download nahi hua.';
+  $('vkGet').textContent=vkReady()?'Dobara check karein':'Offline awaz download karein'}
+$('vkForce').onchange=()=>{lsSet('vk-force',$('vkForce').checked?'1':'0');engineLabel()};
+$('vkGet').onclick=async()=>{
+  if(!navigator.onLine&&!vkReady()){$('vkStatus').textContent='Download ke liye internet chahiye.';return}
+  $('vkGet').disabled=true;$('vkStatus').textContent='Download ho rahi hai, 1 se 3 minute lag sakte hain. Is screen ko band na karein...';
+  try{await vkLoad();$('vkStatus').textContent='Ho gaya. Ab mic bina internet ke bhi chalega.'}
+  catch(e){$('vkStatus').textContent='Download nahi ho saki. Internet check karke dobara koshish karein.'}
+  $('vkGet').disabled=false;engineLabel()};
+
+async function vkStart(){
+  if(!vkReady()&&!navigator.onLine){hint('Offline awaz abhi download nahi hui. Internet par Report tab mein jaa kar download karein. Tab tak neeche likh kar entry karein.',true);return}
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){hint('Is browser mein mic nahi mil saka. Neeche likh kar entry karein.',true);return}
+  live=true;$('micBtn').classList.add('live');
+  if(!vkModel)hint(vkReady()?'Offline awaz tayyar ho rahi hai, thoda intezar...':'Pehli dafa offline awaz download ho rahi hai (45MB)...');
+  let model;try{model=await vkLoad()}catch(e){live=false;$('micBtn').classList.remove('live');hint('Offline awaz load nahi hui. Neeche likh kar entry karein.',true);return}
+  let stream;try{stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,channelCount:1}})}
+  catch(e){live=false;$('micBtn').classList.remove('live');hint('Mic ki ijazat nahi mili. Browser mein mic "Allow" karein.',true);return}
+  const ctx=new (window.AudioContext||window.webkitAudioContext)();
+  const r=new model.KaldiRecognizer(ctx.sampleRate);
+  const src=ctx.createMediaStreamSource(stream);const proc=ctx.createScriptProcessor(4096,1,1);
+  let done=false,timer=null;
+  const stop=(text)=>{if(done)return;done=true;clearTimeout(timer);
+    try{proc.disconnect();src.disconnect()}catch(e){}stream.getTracks().forEach(t=>t.stop());ctx.close().catch(()=>{});try{r.remove()}catch(e){}
+    vk=null;live=false;$('micBtn').classList.remove('live');
+    const t=(text||'').trim();
+    if(t){const roman=devaToRoman(t);$('heard').textContent=roman;hint('Mic dabayein aur bolein');showConfirm(parse(roman))}
+    else hint('Kuch suna nahi, dobara bolein.',true)};
+  r.on('partialresult',m=>{const p=m&&m.result&&m.result.partial;if(p)$('heard').textContent=devaToRoman(p)});
+  r.on('result',m=>{const t=m&&m.result&&m.result.text;if(t&&t.trim())stop(t)});
+  proc.onaudioprocess=e=>{if(!done){try{r.acceptWaveform(e.inputBuffer)}catch(err){}}};
+  src.connect(proc);proc.connect(ctx.destination);
+  hint('Sun raha hoon (offline)... bolein, phir ruk jayein');$('heard').textContent='';
+  timer=setTimeout(()=>{r.on('result',m=>stop(m&&m.result&&m.result.text));try{r.retrieveFinalResult()}catch(e){stop('')}},12000);
+  vk={finish:()=>{r.on('result',m=>stop(m&&m.result&&m.result.text));try{r.retrieveFinalResult()}catch(e){stop('')};setTimeout(()=>stop($('heard').textContent),2500)}}}
+
 $('micBtn').onclick=()=>{
-  if(!navigator.onLine){hint('Internet nahi hai. Mic ko internet chahiye; neeche likh kar entry karein, sab save hoga.',true);$('typeIn').focus();return}
-  if(!SR){hint('Is browser mein awaz ki suvidha nahi. Phone par Chrome mein kholein, ya neeche likhein.',true);return}
-  if(live){rec&&rec.stop();return}
+  if(live){if(vk)vk.finish();else rec&&rec.stop();return}
+  if(useOffline()){vkStart();return}
   rec=new SR();rec.lang=micLang;rec.interimResults=true;rec.maxAlternatives=1;
   rec.onstart=()=>{live=true;$('micBtn').classList.add('live');hint('Sun raha hoon... bolein');$('heard').textContent=''};
   rec.onresult=ev=>{let t='';for(const r of ev.results)t+=r[0].transcript;$('heard').textContent=t;if(ev.results[ev.results.length-1].isFinal)showConfirm(parse(t))};
-  rec.onerror=ev=>{const m={'not-allowed':'Mic ki ijazat nahi mili. Is preview mein mic band hai; asli link par chalega.','service-not-allowed':'Mic ki ijazat nahi mili. Is preview mein mic band hai; asli link par chalega.','network':'Awaz samajhne ke liye internet chahiye. Neeche likh kar entry karein.','no-speech':'Kuch suna nahi, dobara bolein.','audio-capture':'Mic nahi mila. Phone ka mic check karein.'};hint(m[ev.error]||'Awaz samajh nahi aayi, dobara bolein.',true)};
-  rec.onend=()=>{live=false;$('micBtn').classList.remove('live');if($('micHint').textContent.startsWith('Sun'))hint('Mic dabayein aur bolein')};
+  const thisRec=rec;rec.onerror=ev=>{if(ev.error==='network'&&vkReady()){thisRec._fallback=true;return}
+    const m={'not-allowed':'Mic ki ijazat nahi mili. Address bar mein taale ke nishan par click karke Microphone Allow karein.','service-not-allowed':'Ye browser awaz ki suvidha nahi deta. Chrome ya Edge use karein, ya Report tab se offline awaz download karein.','network':'Online mic nahi chala (internet, ya Brave jaisa browser). Report tab se offline awaz download kar lein, ya Chrome/Edge use karein.','no-speech':'Kuch suna nahi, dobara bolein.','audio-capture':'Mic nahi mila. Phone ka mic check karein.'};hint(m[ev.error]||'Awaz samajh nahi aayi, dobara bolein.',true)};
+  rec.onend=()=>{live=false;if(thisRec._fallback){$('micBtn').classList.remove('live');setTimeout(vkStart,200);return}$('micBtn').classList.remove('live');if($('micHint').textContent.startsWith('Sun'))hint('Mic dabayein aur bolein')};
   try{rec.start()}catch(e){hint('Mic shuru nahi ho saka. Neeche likh kar aazmayein.',true)}};
 
 /* ---------- helpers ---------- */
@@ -517,7 +607,8 @@ $('bkLoad').onchange=e=>{const f=e.target.files[0];if(!f)return;const rd=new Fil
 /* ---------- tabs, online status, offline ---------- */
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));
   ['aaj','stock','gahak','report'].forEach(p=>$('p-'+p).hidden=p!==b.dataset.p);if(b.dataset.p==='report')renderReport();scrollTo(0,0)});
-function net(){const on=navigator.onLine;$('netDot').classList.toggle('off',!on);$('netTxt').textContent=on?'Online':'Offline: sab save ho raha hai'}
+function net(){const on=navigator.onLine;$('netDot').classList.toggle('off',!on);$('netTxt').textContent=on?'Online':'Offline: sab save ho raha hai';engineLabel()}
+$('vkForce').checked=lsGet('vk-force')==='1';
 addEventListener('online',net);addEventListener('offline',net);
 $('clearDemo').onclick=()=>{S={items:[],customers:[],entries:[],demo:false};save();render()};
 $('today').textContent=new Date().toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
